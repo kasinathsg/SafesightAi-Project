@@ -1,16 +1,25 @@
 'use client';
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Image from 'next/image';
 import { RingLoader } from 'react-spinners';
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 
 export default function RootLayoutInner({ children }: { children: React.ReactNode }) {
-
-  const [activeTab, setActiveTab] = useState("Dashboard");
   const [showSplash, setShowSplash] = useState(true);
   const [fadeOutSplash, setFadeOutSplash] = useState(false);
   const router = useRouter();
+  const pathname = usePathname(); 
+
+  const menuItems = [
+    { label: "Dashboard", href: "/" },
+    { label: "Analytics", href: "/analytics" },
+    { label: "About", href: "/about" },
+  ];
+
+  const activeTab = menuItems.find(item => item.href === pathname)?.label || "Dashboard";
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -21,11 +30,62 @@ export default function RootLayoutInner({ children }: { children: React.ReactNod
     return () => clearTimeout(timeout);
   }, []);
 
-  const menuItems = [
-    { label: "Dashboard", href: "/" },
-    { label: "Analytics", href: "/analytics" },
-    { label: "About", href: "/about" },
-  ];
+  useEffect(() => {
+    if (!showSplash) {
+      const timeout = setTimeout(() => {
+        const stepTwoExists = document.querySelector('#step-two-target');
+        const stepThreeExists = document.querySelector('#step-three-target');
+
+        if (stepTwoExists && stepThreeExists) {
+          const driverObj = driver({
+            showProgress: true,
+            showButtons: ['next', 'previous'],
+            steps: [
+              {
+                element: '#step-one-target',
+                popover: {
+                  title: 'Sidebar Navigation',
+                  description: 'Use this panel to switch between Dashboard, Analytics, and About sections.',
+                  side: 'right',
+                  align: 'start',
+                },
+              },
+              {
+                element: '#step-two-target',
+                popover: {
+                  title: 'Control Buttons',
+                  description: 'Use these filters and sorting options to refine the data displayed below.',
+                  side: 'bottom',
+                  align: 'start',
+                },
+              },
+              {
+                element: '#step-three-target',
+                popover: {
+                  title: 'Report Incident',
+                  description: 'Click here to report a new AI safety incident. You can provide all relevant details.',
+                  side: 'top',
+                  align: 'start',
+                },
+              },
+              {
+                element: '#final-tour-step',
+                popover: {
+                  title: 'All Set to Go!',
+                  description: "You're now ready to explore the application. Click around to get started.",
+                  align: 'center',
+                },
+              }
+            ],
+          });
+
+          driverObj.drive();
+        }
+      }, 1000); 
+
+      return () => clearTimeout(timeout);
+    }
+  }, [showSplash]);
 
   return (
     <div className="bg-[#fcb75e] min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
@@ -62,14 +122,11 @@ export default function RootLayoutInner({ children }: { children: React.ReactNod
             <p className="text-xs text-[#4a3619] mt-1">kasinathsg@gmail.com</p>
           </div>
 
-          <nav className="flex font-mono flex-col gap-3 font-bold text-lg leading-none items-start w-full">
+          <nav id="step-one-target" className="flex font-mono flex-col gap-3 font-bold text-lg leading-none items-start w-full">
             {menuItems.map((item) => (
               <button
                 key={item.label}
-                onClick={() => {
-                  setActiveTab(item.label);
-                  router.push(item.href);
-                }}
+                onClick={() => router.push(item.href)}
                 className={`w-full text-left px-4 py-2 rounded-xl transition-all duration-300 ease-in-out transform ${
                   activeTab === item.label
                     ? "bg-white/70 text-[#4a3619] shadow-md scale-[1.02]"
@@ -82,7 +139,7 @@ export default function RootLayoutInner({ children }: { children: React.ReactNod
           </nav>
         </aside>
 
-        <div className="bg-white rounded-3xl flex-1 flex flex-col md:flex-row p-6 md:p-12 gap-8 md:gap-12 min-h-[670px]">
+        <div id="#final-tour-step" className="bg-white rounded-3xl flex-1 flex flex-col md:flex-row p-6 md:p-12 gap-8 md:gap-12 min-h-[670px]">
           {children}
         </div>
       </div>

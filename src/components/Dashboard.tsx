@@ -258,8 +258,8 @@ export default function AISafetyIncidentsDashboard() {
 
   return (
     <div className="max-w-5xl mx-auto  bg-white rounded-lg font-karla text-sm flex flex-col h-full">
-      <div  data-intro="This is some information" data-step="2" className="flex justify-between items-center mb-6">
-        <div className="flex space-x-3">
+      <div className="flex justify-between items-center mb-6">
+        <div  id="step-two-target" className="flex space-x-3">
           <div className="relative severity-dropdown">
             <button
               onClick={() => setSeverityDropdownOpen(!isSeverityDropdownOpen)}
@@ -322,7 +322,7 @@ export default function AISafetyIncidentsDashboard() {
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button  className='ml-2' data-intro="This is some wcrferfinformation" data-step="1">Report</Button>
+            <Button  className='ml-2' id="step-three-target">Report</Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
